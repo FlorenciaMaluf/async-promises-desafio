@@ -1,12 +1,10 @@
 import test from "ava";
 import { ContactsCollection } from "./models";
-import * as contactsObject from "./contacts.json";
-import * as jsonfile from "jsonfile";
+import { ContactsControllerOptions, ContactsController } from "./controllers";
 
-test("Testeo el load del modelo", (t) => {
+test("Testeo el load del modelo", async (t) => {
   const model = new ContactsCollection();
-  model.load();
-  t.deepEqual(contactsObject, model.getAll());
+  t.deepEqual(model.data, await model.load());
 });
 
 test("Testeo el addOne del modelo", (t) => {
@@ -19,17 +17,13 @@ test("Testeo el addOne del modelo", (t) => {
   t.deepEqual(model.getAll(), [mockContact]);
 });
 
-test("Testeo el save del modelo", (t) => {
+test("Testeo el save del modelo", async (t) => {
   const model = new ContactsCollection();
-  model.load();
-  const mockContact = {
-    id: 30,
-    name: "Marce",
-  };
-  model.addOne(mockContact);
-  model.save();
-  const fileContent = jsonfile.readFileSync("./contacts.json");
-  t.deepEqual(fileContent, model.getAll());
+  const modelDos = new ContactsController();
+  const testSave = new ContactsControllerOptions();
+  testSave.action = "save";
+  testSave.params = { id: 55, name: "Florencia" };
+  t.deepEqual(model.data, await modelDos.processOptions(testSave));
 });
 
 test("Testeo el getOneById del modelo", (t) => {
